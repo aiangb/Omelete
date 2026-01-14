@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sorteados - Omelete&CO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #E9E9E7;
+            --primary-text: #000000;
+            --accent-dark: #242627;
+            --accent-light: #FFFFFF;
+            --accent-purple: #D9AFD0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            line-height: 1.4em;
+        }
+
+        header {
+            background-color: var(--accent-dark);
+            padding: 20px 50px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header img {
+            height: 40px;
+            width: auto;
+        }
+
+        header a {
+            color: var(--accent-light);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 2000px;
+            margin: 0 auto;
+            padding: 60px 50px;
+        }
+
+        .page-title {
+            font-size: 56px;
+            font-weight: 200;
+            line-height: 1.2em;
+            margin-bottom: 60px;
+            letter-spacing: -1px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 60px 0 30px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .advertisement-content {
+            flex: 1;
+        }
+
+        .advertisement-content h3 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .advertisement-content p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.6em;
+        }
+
+        .advertisement-button {
+            background: var(--accent-dark);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .advertisement-button:hover {
+            background: var(--accent-purple);
+            transform: translateX(5px);
+        }
+
+        .advertisement-image {
+            flex: 0 0 200px;
+            height: 200px;
+        }
+
+        .advertisement-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .raffles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .raffle-card {
+            background: var(--accent-light);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .raffle-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-content {
+            padding: 30px;
+        }
+
+        .card-category {
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: var(--accent-dark);
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .card-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary-text);
+        }
+
+        .card-description {
+            font-size: 14px;
+            color: #5F6567;
+            margin-bottom: 20px;
+            line-height: 1.6em;
+        }
+
+        .card-date {
+            font-size: 12px;
+            color: #5F6567;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--accent-light);
+            width: 90%;
+            max-width: 800px;
+            border-radius: 0;
+            overflow-y: auto;
+            max-height: 90vh;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+        }
+
+        .modal-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-dark);
+            color: var(--accent-light);
+            border: none;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-purple);
+        }
+
+        .modal-body {
+            padding: 40px;
+        }
+
+        .modal-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #E9E9E7;
+        }
+
+        .modal-meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-meta-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #5F6567;
+            margin-bottom: 5px;
+        }
+
+        .modal-meta-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--accent-dark);
+        }
+
+        .modal-description {
+            font-size: 16px;
+            line-height: 1.6em;
+            margin-bottom: 40px;
+            color: #5F6567;
+        }
+
+        .winners-section h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .winners-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .winner-item {
+            background: var(--primary-bg);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--accent-purple);
+        }
+
+        .winner-position {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-dark);
+            min-width: 30px;
+        }
+
+        .winner-info {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .winner-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-text);
+        }
+
+
+
+        .winner-prize {
+            font-size: 13px;
+            color: #5F6567;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 36px;
+                margin-bottom: 40px;
+            }
+
+            .raffles-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            header img {
+                height: 30px;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-title {
+                font-size: 28px;
+            }
+
+            .modal-meta {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .advertisement-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .kabum-banner-expanded {
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+                display: block;
+                margin: 0 auto;
+                object-fit: cover;
+            }
+            .advertisement-banner {
+                width: 80%;
+                margin: 0 auto;
+            }
+                        .advertisement-image {
+                flex: 0 0 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" style="font-size: 18px;">← Voltar</a>
+        <h1 style="color: var(--accent-light); font-size: 24px; font-weight: 600;">Sorteados</h1>
+        <div></div>
+    </header>
+
+      <!-- Publicidade Kabum -->
+<div class="container">
+    <h2 class="page-title">Sorteios e<br>Vencedores</h2>
+
+    <!-- Publicidade Kabum -->
+    <div class="advertisement-banner">
+        <a href="https://www.kabum.com.br" target="_blank">
+            <img src="https://themes.kabum.com.br/conteudo/layout/7474/1768046446.gif" 
+                 alt="Kabum - Sua Tech É Aqui!" 
+                 class="kabum-banner">
+        </a>
+    </div>
+
+    <h3 class="section-title">Próximos Sorteios</h3>
+    <div class="raffles-grid" id="upcomingRafflesGrid"></div>
+
+    <h3 class="section-title">Sorteios Realizados</h3>
+    <div class="raffles-grid" id="rafflesGrid"></div>
+
+</div>
+
+    <!-- Modal de Detalhes -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img id="modalImage" src="" alt="">
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <div class="modal-meta">
+                    <div class="modal-meta-item">
+                        <span class="modal-meta-label">Data do Sorteio</span>
+                        <span class="modal-meta-value" id="modalDate"></span>
+                    </div>
+                    <div class="modal-meta-item">
+                        <span class="modal-meta-label">Prêmio Principal</span>
+                        <span class="modal-meta-value" id="modalPrize"></span>
+                    </div>
+                    <div class="modal-meta-item">
+                        <span class="modal-meta-label">Total de Vencedores</span>
+                        <span class="modal-meta-value" id="modalWinnerCount"></span>
+                    </div>
+                </div>
+                <div class="modal-description" id="modalDescription"></div>
+                <div class="winners-section">
+                    <h3>Vencedores</h3>
+                    <div class="winners-list" id="winnersList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const upcomingRaffles = [
+            {
+                id: 13,
+                title: "PGL Major Cologne - CS2",
+                category: "eSports",
+                description: "Ingressos VIP para o Major Cologne, um dos maiores eventos de Counter-Strike do mundo",
+                date: "15 de Maio de 2026",
+                image: "https://pro.eslgaming.com/tour/wp-content/uploads/2025/08/IEM-Cologne-Major.png",
+                prize: "VIP Pass 5 dias + Viagem Completa",
+                winners: [
+                    { position: "Ganhador Ouro", name: "Em breve", prize: "Passagem de ida e volta + hospedagem em Colônia, Alemanha" }
+                ]
+            },
+            {
+                id: 14,
+                title: "Kings League Brasil 2026",
+                category: "eSports",
+                description: "Sorteio de ingressos para a Kings League Brasil, a liga revolucionária de futebol virtual",
+                date: "20 de Março de 2026",
+                image: "https://admin.cnnbrasil.com.br/wp-content/uploads/sites/12/2025/03/Kings-League-Brazil-e1742269543494.png?w=1120&h=630&crop=1",
+                prize: "VIP Pass + Merchandise Exclusivo",
+                winners: [
+                    { position: "1º Lugar", name: "Em breve", prize: "5 Ingressos VIP + Jersey Oficial da G3X" },
+                    { position: "2º Lugar", name: "Em breve", prize: "3 Ingressos VIP + Kit Merchandise Completo" },
+                    { position: "3º Lugar", name: "Em breve", prize: "2 Ingressos VIP + Camiseta Kings League" },
+                    { position: "4º Lugar", name: "Em breve", prize: "Merchandise Exclusivo Kings League" }
+                ]
+            },
+            {
+                id: 15,
+                title: "Notebook Gamer Kabum",
+                category: "Tecnologia",
+                description: "Sorteio de notebook gamer de alta performance com processador i9 e RTX 4090",
+                date: "30 de Agosto de 2026",
+                image: "https://www.clubebits.com.br/images_storage/23644_01.jpg",
+                prize: "Notebook Gamer High-End + Acessórios",
+                winners: [
+                    { position: "Ganhador Principal", name: "Em breve", prize: "Acer Predator Helios 18 (Intel Core i9 + RTX 4090) + Mochila + Mouse" },
+                    { position: "Segundo Lugar", name: "Em breve", prize: "HP Omen 17 (Intel Core i7 + RTX 4070) + Headset Gamer" },
+                    { position: "Terceiro Lugar", name: "Em breve", prize: "Acer Nitro 16 (Intel Core i5 + RTX 4060) + Mousepad" }
+                ]
+            }
+        ];
+
+        const raffles = [
+            {
+            id: 1,
+            title: "IEM Rio 2026 - ESL Pro Tour",
+            category: "Esports",
+            description: "Sorteio de ingressos VIP para o maior torneio de Counter-Strike 2 realizado no Brasil",
+            date: "20 de Abril de 2026",
+            image: "https://pro.eslgaming.com/tour/wp-content/uploads/2025/12/ept-cs2-iem-rio-2026-EN.jpg",
+            prize: "3 Pacotes VIP Experience - Viagem + Hotel + Ingressos",
+            winners: [
+                {
+                position: "1º Sorteada",
+                name: "Ana Paula de Lima",
+                prize: "Pacote VIP Experience completo (Ingresso + Camarote + Meet & Greet)",
+                cpf: "13*.***.***-01",
+                phone: "(11)99***-9067",
+                drawId: "981673",
+                participationDate: "20-11-2025",
+                phrase: "O CS2 é minha paixão, e o IEM Rio vai ser épico!"
+                },
+                {
+                position: "2º Lugar",
+                name: "Haziel Felipe de Amaral",
+                prize: "Ingresso VIP 3 dias + Kit Exclusivo ESL",
+                cpf: "14*.***.***-62",
+                phone: "(49)99***-2168",
+                drawId: "2984763",
+                participationDate: "27-12-2025",
+                phrase: "Torcendo pelo Brasil no maior torneio de CS2!"
+                },
+                {
+                position: "3º Lugar",
+                name: "Mariana Costa",
+                prize: "Ingresso VIP 1 dia + Camiseta Oficial",
+                cpf: "11*.***.***-03",
+                phone: "(11)99***-7405",
+                drawId: "1465235",
+                participationDate: "05-01-2026",
+                phrase: "Ansioso para ver os melhores do mundo no IEM Rio!"
+                }
+            ]
+            },
+            {
+            id: 2,
+            title: "CCXP 2025",
+            category: "Live Experience",
+            description: "Sorteio de ingressos para a maior conferência de cultura pop do mundo",
+            date: "10 de Novembro de 2025",
+            image: "https://legadodamarvel.com.br/wp-content/uploads/2022/06/CCXP-revela-valores-do-2o-lote-de-ingressos-do-evento-que-acontece-em-dezembro-legadodamarvel.jpg",
+            prize: "3 Ingressos VIP",
+            winners: [
+                { position: "1º Lugar", name: "João Silva", prize: "Ingresso VIP 3 dias", cpf: "27*.***.***-61", phone: "(21)99***-1122", drawId: "002", participationDate: "2024-11-01", phrase: "CCXP é onde a cultura pop ganha vida!" },
+                { position: "2º Lugar", name: "Maria Santos", prize: "Ingresso VIP 3 dias", cpf: "76*.***.***-52", phone: "(54)98***-3344", drawId: "002", participationDate: "2024-11-02", phrase: "Ansioso para mergulhar no universo geek na CCXP!" },
+                { position: "3º Lugar", name: "Carlos Oliveira", prize: "Ingresso VIP 1 dia", cpf: "01*.***.***-06", phone: "(51)99***-5566", drawId: "002", participationDate: "2024-11-03", phrase: "CCXP 2025 vai ser inesquecível!" }
+            ]
+            },
+            {
+            id: 3,
+            title: "Console PlayStation 5",
+            category: "eSports",
+            description: "Sorteio exclusivo de um PlayStation 5 Pro para os fãs de gaming",
+            date: "20 de Novembro de 2024",
+            image: "https://www.oficinadanet.com.br/media/post/56729/1200/sony-lanca-playstation-5-pro.jpg",
+            prize: "PS5 Pro",
+            winners: [
+                { position: "Ganhador", name: "Pedro Gamer", prize: "PlayStation 5 Pro", cpf: "28*.***.***-07", phone: "(14)97***-1046", drawId: "003", participationDate: "2024-11-20", phrase: "PS5 é o console dos sonhos!" },
+                { position: "Prêmio Especial", name: "Ana Costa", prize: "5 Jogos na PS Store", cpf: "06*.***.***-08", phone: "(14)98***-3769", drawId: "003", participationDate: "2024-11-21", phrase: "Jogos incríveis no PS5!" },
+                { position: "Prêmio Especial", name: "Lucas Mendes", prize: "PlayStation Plus 1 ano", cpf: "34*.***.***-09", phone: "(11)99***-2574", drawId: "003", participationDate: "2024-11-22", phrase: "A nova geração de jogos começa com o PS5!" }
+            ]
+            },
+            {
+            id: 5,
+            title: "G3X Arena - Equipamentos Gamer",
+            category: "eSports",
+            description: "Sorteio de setup completo para aspirantes a pro players",
+            date: "05 de Setembro de 2025",
+            image: "https://shopinfo.vteximg.com.br/arquivos/hotsite-sorteio-resgate-setup-dos-sonhos-desktop_01.jpg?v=637370986675300000",
+            prize: "Setup Gamer Completo",
+            winners: [
+                { position: "Ganhador Principal", name: "Rafael Esports", prize: "PC Gamer High-End + Monitor + Periféricos", cpf: "88*.***.***-10", phone: "(91)99***-1122", drawId: "004", participationDate: "2024-09-05", phrase: "Setup gamer completo da G3X!" },
+                { position: "Segundo Lugar", name: "Isabella Pro", prize: "Monitor 240Hz + Cadeira Gamer", cpf: "14*.***.***-11", phone: "(11)99***-9782", drawId: "004", participationDate: "2024-09-06", phrase: "Equipamentos top para pro players!" },
+                { position: "Terceiro Lugar", name: "Diego Silver", prize: "Teclado + Mouse Mecânico Pro", cpf: "67*.***.***-12", phone: "(21)99***-2586", drawId: "004", participationDate: "2024-09-07", phrase: "G3X Arena: o melhor para gamers!" }
+            ]
+            },
+            {
+                id: 6,
+                title: "Sorteio de Socios Fundadores G3X",
+                category: "Live Experience",
+                description: "Sorteio de títulos variados para os primeiros socios fundadores da G3X",
+                date: "25 de Agosto de 2025",
+                image: "https://cdn.prod.website-files.com/674924b5783e16c39ab042bc/67746b81d2d410aa65f27407_SEJA-MAIS-PROXIMO-G3X.jpg",
+                prize: "50 títulos variados",
+                winners: [
+                    {
+                    "position": "Sorteado 1",
+                    "name": "João Silva",
+                    "prize": "1 título variado",
+                    "cpf": "42*.***.***-15",
+                    "phone": "(81)99***-9638",
+                    "drawId": "5069166",
+                    "participationDate": "04-08-2025",
+                    "phrase": "Ser sócio fundador é a oportunidade perfeita para apoiar o futuro dos eSports!"
+                    },
+                    {
+                    "position": "Sorteado 2",
+                    "name": "Maria Santos",
+                    "prize": "1 título variado",
+                    "cpf": "39*.***.***-42",
+                    "phone": "(51)99***-5266",
+                    "drawId": "4076862",
+                    "participationDate": "27-01-2025",
+                    "phrase": "A G3X vai revolucionar o cenário gamer brasileiro!"
+                    },
+                    {
+                    "position": "Sorteado 3",
+                    "name": "Pedro Oliveira",
+                    "prize": "1 título variado",
+                    "cpf": "99*.***.***-08",
+                    "phone": "(21)99***-9622",
+                    "drawId": "6176940",
+                    "participationDate": "19-05-2025",
+                    "phrase": "Ansioso para ver a G3X crescer e se tornar gigante!"
+                    },
+                    {
+                    "position": "Sorteado 4",
+                    "name": "Ana Costa",
+                    "prize": "1 título variado",
+                    "cpf": "52*.***.***-45",
+                    "phone": "(21)99***-4111",
+                    "drawId": "8486801",
+                    "participationDate": "23-08-2025",
+                    "phrase": "Ser sócio fundador é a oportunidade perfeita para apoiar o futuro dos eSports!"
+                    },
+                    {
+                    "position": "Sorteado 5",
+                    "name": "Carlos Pereira",
+                    "prize": "1 título variado",
+                    "cpf": "31*.***.***-76",
+                    "phone": "(51)99***-8761",
+                    "drawId": "8476124",
+                    "participationDate": "15-05-2025",
+                    "phrase": "Quero fazer parte da história da G3X desde o início!"
+                    },
+                    {
+                    "position": "Sorteado 6",
+                    "name": "Fernanda Lima",
+                    "prize": "1 título variado",
+                    "cpf": "38*.***.***-30",
+                    "phone": "(51)99***-0051",
+                    "drawId": "4634480",
+                    "participationDate": "28-04-2025",
+                    "phrase": "A G3X representa inovação e paixão pelo gaming!"
+                    },
+                    {
+                    "position": "Sorteado 7",
+                    "name": "Lucas Rodrigues",
+                    "prize": "1 título variado",
+                    "cpf": "41*.***.***-32",
+                    "phone": "(91)99***-9546",
+                    "drawId": "7053568",
+                    "participationDate": "31-07-2025",
+                    "phrase": "Ansioso para ver a G3X crescer e se tornar gigante!"
+                    },
+                    {
+                    "position": "Sorteado 8",
+                    "name": "Juliana Almeida",
+                    "prize": "1 título variado",
+                    "cpf": "77*.***.***-62",
+                    "phone": "(61)99***-0982",
+                    "drawId": "5375051",
+                    "participationDate": "08-06-2025",
+                    "phrase": "Como fã de eSports, ser sócio fundador é um sonho!"
+                    },
+                    {
+                    "position": "Sorteado 9",
+                    "name": "Rafael Ferreira",
+                    "prize": "1 título variado",
+                    "cpf": "85*.***.***-19",
+                    "phone": "(21)99***-7070",
+                    "drawId": "9223472",
+                    "participationDate": "13-05-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 10",
+                    "name": "Camila Gomes",
+                    "prize": "1 título variado",
+                    "cpf": "48*.***.***-25",
+                    "phone": "(31)99***-4488",
+                    "drawId": "7544628",
+                    "participationDate": "13-02-2025",
+                    "phrase": "Apoiar a G3X é investir no futuro dos jogos!"
+                    },
+                                    {
+                    "position": "Sorteado 10",
+                    "name": "Camila Gomes",
+                    "prize": "1 título variado",
+                    "cpf": "48*.***.***-25",
+                    "phone": "(31)99***-4488",
+                    "drawId": "7544628",
+                    "participationDate": "13-02-2025",
+                    "phrase": "Apoiar a G3X é investir no futuro dos jogos!"
+                    },
+                    {
+                    "position": "Sorteado 11",
+                    "name": "Gustavo Carvalho",
+                    "prize": "1 título variado",
+                    "cpf": "15*.***.***-19",
+                    "phone": "(91)99***-7194",
+                    "drawId": "955417",
+                    "participationDate": "09-04-2025",
+                    "phrase": "Quero contribuir para o sucesso da maior comunidade gamer!"
+                    },
+                    {
+                    "position": "Sorteado 12",
+                    "name": "Isabela Martins",
+                    "prize": "1 título variado",
+                    "cpf": "32*.***.***-98",
+                    "phone": "(61)99***-5176",
+                    "drawId": "2535420",
+                    "participationDate": "10-07-2025",
+                    "phrase": "Ansioso para ver a G3X crescer e se tornar gigante!"
+                    },
+                    {
+                    "position": "Sorteado 13",
+                    "name": "Felipe Souza",
+                    "prize": "1 título variado",
+                    "cpf": "98*.***.***-08",
+                    "phone": "(31)99***-6844",
+                    "drawId": "6506538",
+                    "participationDate": "03-02-2025",
+                    "phrase": "Quero fazer parte da história da G3X desde o início!"
+                    },
+                    {
+                    "position": "Sorteado 14",
+                    "name": "Larissa Rocha",
+                    "prize": "1 título variado",
+                    "cpf": "22*.***.***-75",
+                    "phone": "(71)99***-0988",
+                    "drawId": "8218912",
+                    "participationDate": "05-01-2025",
+                    "phrase": "Ser sócio fundador é a oportunidade perfeita para apoiar o futuro dos eSports!"
+                    },
+                    {
+                    "position": "Sorteado 15",
+                    "name": "Bruno Alves",
+                    "prize": "1 título variado",
+                    "cpf": "69*.***.***-24",
+                    "phone": "(71)99***-3065",
+                    "drawId": "5112351",
+                    "participationDate": "13-08-2025",
+                    "phrase": "Ansioso para ver a G3X crescer e se tornar gigante!"
+                    },
+                    {
+                    "position": "Sorteado 16",
+                    "name": "Amanda Ribeiro",
+                    "prize": "1 título variado",
+                    "cpf": "66*.***.***-04",
+                    "phone": "(21)99***-1396",
+                    "drawId": "8848494",
+                    "participationDate": "24-06-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 17",
+                    "name": "Diego Barbosa",
+                    "prize": "1 título variado",
+                    "cpf": "47*.***.***-70",
+                    "phone": "(31)99***-5835",
+                    "drawId": "9105600",
+                    "participationDate": "07-03-2025",
+                    "phrase": "A G3X representa inovação e paixão pelo gaming!"
+                    },
+                    {
+                    "position": "Sorteado 18",
+                    "name": "Patrícia Fernandes",
+                    "prize": "1 título variado",
+                    "cpf": "85*.***.***-24",
+                    "phone": "(41)99***-4186",
+                    "drawId": "194151",
+                    "participationDate": "07-07-2025",
+                    "phrase": "Como fã de eSports, ser sócio fundador é um sonho!"
+                    },
+                    {
+                    "position": "Sorteado 19",
+                    "name": "Thiago Castro",
+                    "prize": "1 título variado",
+                    "cpf": "29*.***.***-34",
+                    "phone": "(71)99***-0607",
+                    "drawId": "1626560",
+                    "participationDate": "22-06-2025",
+                    "phrase": "Apoiar a G3X é investir no futuro dos jogos!"
+                    },
+                    {
+                    "position": "Sorteado 20",
+                    "name": "Beatriz Moreira",
+                    "prize": "1 título variado",
+                    "cpf": "52*.***.***-34",
+                    "phone": "(51)99***-1404",
+                    "drawId": "790897",
+                    "participationDate": "06-02-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 21",
+                    "name": "Vinícius Cardoso",
+                    "prize": "1 título variado",
+                    "cpf": "65*.***.***-06",
+                    "phone": "(71)99***-2180",
+                    "drawId": "9411433",
+                    "participationDate": "24-05-2025",
+                    "phrase": "Ser parte da G3X é ser parte de algo grandioso!"
+                    },
+                    {
+                    "position": "Sorteado 22",
+                    "name": "Carolina Pinto",
+                    "prize": "1 título variado",
+                    "cpf": "77*.***.***-13",
+                    "phone": "(11)99***-3725",
+                    "drawId": "8270955",
+                    "participationDate": "23-01-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 23",
+                    "name": "Leonardo Mendes",
+                    "prize": "1 título variado",
+                    "cpf": "26*.***.***-80",
+                    "phone": "(61)99***-5437",
+                    "drawId": "3032165",
+                    "participationDate": "02-01-2025",
+                    "phrase": "Ser parte da G3X é ser parte de algo grandioso!"
+                    },
+                    {
+                    "position": "Sorteado 24",
+                    "name": "Sofia Correia",
+                    "prize": "1 título variado",
+                    "cpf": "83*.***.***-82",
+                    "phone": "(11)99***-5714",
+                    "drawId": "1735848",
+                    "participationDate": "26-07-2025",
+                    "phrase": "Ser parte da G3X é ser parte de algo grandioso!"
+                    },
+                    {
+                    "position": "Sorteado 25",
+                    "name": "Matheus Dias",
+                    "prize": "1 título variado",
+                    "cpf": "64*.***.***-76",
+                    "phone": "(91)99***-5582",
+                    "drawId": "7709639",
+                    "participationDate": "13-08-2025",
+                    "phrase": "Quero contribuir para o sucesso da maior comunidade gamer!"
+                    },{
+                    "position": "Sorteado 26",
+                    "name": "Luana Nunes",
+                    "prize": "1 título variado",
+                    "cpf": "24*.***.***-42",
+                    "phone": "(21)99***-9919",
+                    "drawId": "1696961",
+                    "participationDate": "07-08-2025",
+                    "phrase": "Ser sócio fundador é a oportunidade perfeita para apoiar o futuro dos eSports!"
+                    },
+                    {
+                    "position": "Sorteado 27",
+                    "name": "Gabriel Teixeira",
+                    "prize": "1 título variado",
+                    "cpf": "62*.***.***-07",
+                    "phone": "(31)99***-1686",
+                    "drawId": "9035048",
+                    "participationDate": "14-04-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 28",
+                    "name": "Letícia Ramos",
+                    "prize": "1 título variado",
+                    "cpf": "16*.***.***-48",
+                    "phone": "(31)99***-9455",
+                    "drawId": "77337",
+                    "participationDate": "18-02-2025",
+                    "phrase": "A G3X vai revolucionar o cenário gamer brasileiro!"
+                    },
+                    {
+                    "position": "Sorteado 29",
+                    "name": "Henrique Lopes",
+                    "prize": "1 título variado",
+                    "cpf": "42*.***.***-22",
+                    "phone": "(11)99***-5450",
+                    "drawId": "7080659",
+                    "participationDate": "16-05-2025",
+                    "phrase": "Como fã de eSports, ser sócio fundador é um sonho!"
+                    },
+                    {
+                    "position": "Sorteado 30",
+                    "name": "Manuela Vieira",
+                    "prize": "1 título variado",
+                    "cpf": "56*.***.***-40",
+                    "phone": "(81)99***-7790",
+                    "drawId": "6848085",
+                    "participationDate": "22-01-2025",
+                    "phrase": "Ser parte da G3X é ser parte de algo grandioso!"
+                    },
+                    {
+                    "position": "Sorteado 31",
+                    "name": "Arthur Santos",
+                    "prize": "1 título variado",
+                    "cpf": "13*.***.***-17",
+                    "phone": "(81)99***-8499",
+                    "drawId": "8877462",
+                    "participationDate": "15-05-2025",
+                    "phrase": "Quero contribuir para o sucesso da maior comunidade gamer!"
+                    },
+                    {
+                    "position": "Sorteado 32",
+                    "name": "Laura Oliveira",
+                    "prize": "1 título variado",
+                    "cpf": "65*.***.***-60",
+                    "phone": "(11)99***-0649",
+                    "drawId": "6886178",
+                    "participationDate": "12-08-2025",
+                    "phrase": "Apoiar a G3X é investir no futuro dos jogos!"
+                    },
+                    {
+                    "position": "Sorteado 33",
+                    "name": "Bernardo Costa",
+                    "prize": "1 título variado",
+                    "cpf": "36*.***.***-06",
+                    "phone": "(81)99***-8440",
+                    "drawId": "1337099",
+                    "participationDate": "14-07-2025",
+                    "phrase": "Como fã de eSports, ser sócio fundador é um sonho!"
+                    },
+                    {
+                    "position": "Sorteado 34",
+                    "name": "Valentina Pereira",
+                    "prize": "1 título variado",
+                    "cpf": "44*.***.***-14",
+                    "phone": "(51)99***-3660",
+                    "drawId": "8363195",
+                    "participationDate": "02-06-2025",
+                    "phrase": "Ser sócio fundador é a oportunidade perfeita para apoiar o futuro dos eSports!"
+                    },
+                    {
+                    "position": "Sorteado 35",
+                    "name": "Heitor Lima",
+                    "prize": "1 título variado",
+                    "cpf": "62*.***.***-65",
+                    "phone": "(41)99***-3632",
+                    "drawId": "392788",
+                    "participationDate": "03-07-2025",
+                    "phrase": "A G3X vai revolucionar o cenário gamer brasileiro!"
+                    },
+                    {
+                    "position": "Sorteado 36",
+                    "name": "Helena Rodrigues",
+                    "prize": "1 título variado",
+                    "cpf": "85*.***.***-78",
+                    "phone": "(91)99***-6118",
+                    "drawId": "6437291",
+                    "participationDate": "21-04-2025",
+                    "phrase": "Ansioso para ver a G3X crescer e se tornar gigante!"
+                    },
+                    {
+                    "position": "Sorteado 37",
+                    "name": "Samuel Almeida",
+                    "prize": "1 título variado",
+                    "cpf": "73*.***.***-05",
+                    "phone": "(61)99***-2073",
+                    "drawId": "5218321",
+                    "participationDate": "14-03-2025",
+                    "phrase": "Ansioso para ver a G3X crescer e se tornar gigante!"
+                    },
+                    {
+                    "position": "Sorteado 38",
+                    "name": "Alice Ferreira",
+                    "prize": "1 título variado",
+                    "cpf": "25*.***.***-57",
+                    "phone": "(61)99***-7025",
+                    "drawId": "7267163",
+                    "participationDate": "12-03-2025",
+                    "phrase": "Ansioso para ver a G3X crescer e se tornar gigante!"
+                    },
+                    {
+                    "position": "Sorteado 39",
+                    "name": "Miguel Gomes",
+                    "prize": "1 título variado",
+                    "cpf": "48*.***.***-73",
+                    "phone": "(51)99***-4948",
+                    "drawId": "6222852",
+                    "participationDate": "24-06-2025",
+                    "phrase": "Como fã de eSports, ser sócio fundador é um sonho!"
+                    },
+                    {
+                    "position": "Sorteado 40",
+                    "name": "Sophia Carvalho",
+                    "prize": "1 título variado",
+                    "cpf": "34*.***.***-49",
+                    "phone": "(71)99***-4671",
+                    "drawId": "8601578",
+                    "participationDate": "23-08-2025",
+                    "phrase": "Ser parte da G3X é ser parte de algo grandioso!"
+                    },
+                                    {
+                    "position": "Sorteado 41",
+                    "name": "Davi Martins",
+                    "prize": "1 título variado",
+                    "cpf": "49*.***.***-87",
+                    "phone": "(51)99***-4134",
+                    "drawId": "4696540",
+                    "participationDate": "05-04-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 42",
+                    "name": "Isadora Souza",
+                    "prize": "1 título variado",
+                    "cpf": "94*.***.***-54",
+                    "phone": "(31)99***-9256",
+                    "drawId": "7633074",
+                    "participationDate": "02-01-2025",
+                    "phrase": "Ser sócio fundador é a oportunidade perfeita para apoiar o futuro dos eSports!"
+                    },
+                    {
+                    "position": "Sorteado 43",
+                    "name": "Lucas Rocha",
+                    "prize": "1 título variado",
+                    "cpf": "31*.***.***-02",
+                    "phone": "(91)99***-7590",
+                    "drawId": "1750410",
+                    "participationDate": "13-06-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 44",
+                    "name": "Maria Eduarda Alves",
+                    "prize": "1 título variado",
+                    "cpf": "66*.***.***-20",
+                    "phone": "(71)99***-5117",
+                    "drawId": "7226255",
+                    "participationDate": "29-07-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 45",
+                    "name": "Pedro Ribeiro",
+                    "prize": "1 título variado",
+                    "cpf": "65*.***.***-37",
+                    "phone": "(11)99***-6941",
+                    "drawId": "8424412",
+                    "participationDate": "12-01-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 46",
+                    "name": "Ana Clara Barbosa",
+                    "prize": "1 título variado",
+                    "cpf": "81*.***.***-06",
+                    "phone": "(21)99***-4926",
+                    "drawId": "2003731",
+                    "participationDate": "26-01-2025",
+                    "phrase": "Ser sócio fundador é a oportunidade perfeita para apoiar o futuro dos eSports!"
+                    },
+                    {
+                    "position": "Sorteado 47",
+                    "name": "João Pedro Fernandes",
+                    "prize": "1 título variado",
+                    "cpf": "46*.***.***-15",
+                    "phone": "(31)99***-9533",
+                    "drawId": "5513436",
+                    "participationDate": "27-01-2025",
+                    "phrase": "Como entusiasta, ser sócio fundador é essencial!"
+                    },
+                    {
+                    "position": "Sorteado 48",
+                    "name": "Maria Luiza Castro",
+                    "prize": "1 título variado",
+                    "cpf": "24*.***.***-19",
+                    "phone": "(61)99***-9087",
+                    "drawId": "4167752",
+                    "participationDate": "10-03-2025",
+                    "phrase": "Como fã de eSports, ser sócio fundador é um sonho!"
+                    },
+                    {
+                    "position": "Sorteado 49",
+                    "name": "Enzo Moreira",
+                    "prize": "1 título variado",
+                    "cpf": "46*.***.***-03",
+                    "phone": "(61)99***-6881",
+                    "drawId": "5107153",
+                    "participationDate": "23-04-2025",
+                    "phrase": "Como fã de eSports, ser sócio fundador é um sonho!"
+                    },
+                    {
+                    "position": "Sorteado 50",
+                    "name": "Laura Cardoso",
+                    "prize": "1 título variado",
+                    "cpf": "32*.***.***-11",
+                    "phone": "(71)99***-0287",
+                    "drawId": "2501207",
+                    "participationDate": "02-03-2025",
+                    "phrase": "Quero contribuir para o sucesso da maior comunidade gamer!"
+                    }
+                ]
+            },
+            {
+            id: 7,
+            title: "Viagem Gamescom Latam",
+            category: "Live Experience",
+            description: "Sorteio de viagem completa para o maior evento de games da América Latina",
+            date: "12 de Julho de 2024",
+            image: "https://tm.ibxk.com.br/2025/04/23/23233126516020.jpg?ims=1200x675",
+            prize: "Viagem + Hotel + Ingressos",
+            winners: [
+                { "position": "Ganhador", "name": "Aventureiro Santos", prize: "Passagem aérea + 5 noites hotel + VIP Pass", "cpf": "11*.***.***-13", "phone": "(31)99***-9999", "drawId": "007", "participationDate": "2024-07-12", "phrase": "Gamescom: o maior evento de games!" },
+                { "position": "Prêmio Consolação", "name": "Gamer Friends", prize: "VIP Pass 3 dias", "cpf": "22*.***.***-14", "phone": "(41)99***-9999", "drawId": "007", "participationDate": "2024-07-13", "phrase": "Viagem incrível para a Gamescom!" },
+                { "position": "Prêmio Consolação", "name": "Tech Lover", prize: "Ingresso comum 5 dias", "cpf": "33*.***.***-15", "phone": "(51)99***-9999", "drawId": "007", "participationDate": "2024-07-14", "phrase": "Ansioso para conhecer a Gamescom!" }
+            ]
+            },
+            {
+            id: 8,
+            title: "Liga Brasileira de League of Legends",
+            category: "eSports",
+            description: "Sorteio de ingressos e merchandise oficial da CBLoL 2025",
+            date: "28 de Janeiro de 2025",
+            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjbTrXcKc92hUnLWsR7BO333xCIaaebGq85A&s",
+            prize: "Pacote VIP + Merchandise Exclusivo",
+            winners: [
+                { "position": "1º Lugar", "name": "Summoner Pro", prize: "5 Ingressos VIP CBLoL + Jersey Oficial", "cpf": "44*.***.***-16", "phone": "(61)99***-9012", "drawId": "008", "participationDate": "2025-01-28", "phrase": "CBLOL: o melhor do League of Legends!" },
+                { "position": "2º Lugar", "name": "Yasuo Mestre", prize: "3 Ingressos VIP + Chaveiro Colecionável", "cpf": "55*.***.***-17", "phone": "(71)99***-1234", "drawId": "008", "participationDate": "2025-01-29", "phrase": "Torcendo pelo meu time no CBLOL!" },
+                { "position": "3º Lugar", "name": "Ahri Champion", prize: "2 Ingressos VIP + Camiseta", "cpf": "66*.***.***-18", "phone": "(81)99***-3456", "drawId": "008", "participationDate": "2025-01-30", "phrase": "CBLOL 2025 vai ser épico!" },
+                { "position": "4º Lugar", "name": "Rift Runner", prize: "Merchandise Exclusivo CBLoL", "cpf": "77*.***.***-19", "phone": "(91)99***-5678", "drawId": "008", "participationDate": "2025-01-31", "phrase": "League of Legends no Brasil!" }
+            ]
+            },
+            {
+            id: 9,
+            title: "Counter-Strike 2 - PGL Major",
+            category: "eSports",
+            description: "Ingressos para o maior campeonato de Counter-Strike do ano",
+            date: "14 de Janeiro de 2025",
+            image: "https://egamersworld.com/cdn-cgi/image/width=690,quality=75,format=webp/uploads/blog/1/17/1761292448218_1761292448218.webp",
+            prize: "VIP Pass + Skins Exclusivas",
+            winners: [
+                { "position": "Ganhador Ouro", "name": "AWP Master", prize: "VIP Pass 5 dias + R$2000 em skins CS2", "cpf": "88*.***.***-20", "phone": "(11)99***-7890", "drawId": "009", "participationDate": "2025-01-14", "phrase": "PGL Major: o auge do CS2!" },
+                { "position": "Ganhador Prata", "name": "FaZe Fan", prize: "Ingresso VIP 3 dias + R$1000 em skins", "cpf": "99*.***.***-21", "phone": "(21)99***-0123", "drawId": "009", "participationDate": "2025-01-15", "phrase": "O maior torneio de Counter-Strike!" },
+                { "position": "Ganhador Bronze", "name": "Smoke Grenade", prize: "2 Ingressos Premium + R$500 em skins", "cpf": "00*.***.***-22", "phone": "(31)99***-2345", "drawId": "009", "participationDate": "2025-01-16", "phrase": "PGL Major Copenhagen: épico!" }
+            ]
+            },
+            {
+            id: 10,
+            title: "BLAST Premier World Final",
+            category: "eSports",
+            description: "Sorteio para a grande final do circuito BLAST Premier de Counter-Strike",
+            date: "05 de Dezembro de 2024",
+            image: "https://cdn.sanity.io/images/6znhzi10/production/1920982ddacdc8f90b13542614c5ff8d0f1edf24-1920x1080.png?w=768&auto=format",
+            prize: "Passagens Aéreas + Hotel + VIP Pass",
+            winners: [
+                { "position": "Ganhador", "name": "Pro Player Dreams", prize: "Passagem aérea + 5 noites hotel + VIP Pass", "cpf": "19*.***.***-57", "phone": "(41)99***-4567", "drawId": "010", "participationDate": "2024-12-05", "phrase": "BLAST Premier: final mundial!" },
+                { "position": "Segundo Lugar", "name": "Thunder Esports", prize: "VIP Pass 5 dias + Merchandise BLAST", "cpf": "91*.***.***-24", "phone": "(51)99***-6789", "drawId": "010", "participationDate": "2024-12-06", "phrase": "O encerramento perfeito da temporada!" },
+                { "position": "Terceiro Lugar", "name": "Storm Gaming", prize: "Ingressos Premium 3 dias", "cpf": "33*.***.***-25", "phone": "(61)99***-8901", "drawId": "514 7564", "participationDate": "2024-12-07", "phrase": "BLAST World Final: emoção total!" }
+            ]
+            },
+            {
+            id: 11,
+            title: "Valorant Champions Tour",
+            category: "eSports",
+            description: "Sorteio de equipo gaming oficial do Valorant com suporte técnico",
+            date: "18 de Novembro de 2024",
+            image: "https://a.espncdn.com/photo/2023/0823/r1214461_1296x729_16-9.jpg",
+            prize: "Setup Pro Valorant",
+            winners: [
+                { "position": "Ganhador Ouro", "name": "Radiant Player", prize: "PC Gamer + Periféricos Valorant + Monitores", "cpf": "44*.***.***-26", "phone": "(71)99***-0123", "drawId": "1466345", "participationDate": "2024-11-18", "phrase": "Valorant Champions: o topo!" },
+                { "position": "Ganhador Prata", "name": "Spike Handler", prize: "Monitor 360Hz + Headset Pro", "cpf": "13*.***.***-26", "phone": "(11)99***-2521", "drawId": "973624", "participationDate": "2024-11-19", "phrase": "O campeonato mundial de Valorant!" },
+                { "position": "Ganhador Bronze", "name": "Sage Healing", prize: "Teclado Mecânico + Mouse Gaming", "cpf": "92*.***.***-96", "phone": "(91)99***-8723", "drawId": "157451", "participationDate": "2024-11-20", "phrase": "Valorant Champions Tour: épico!" }
+            ]
+            }
+            ];
+
+        function initRaffles() {
+            // Próximos sorteios
+            const upcomingGrid = document.getElementById('upcomingRafflesGrid');
+            upcomingGrid.innerHTML = upcomingRaffles.map(raffle => `
+                <div class="raffle-card" onclick="openModal(${raffle.id})">
+                    <img src="${raffle.image}" alt="${raffle.title}" class="card-image">
+                    <div class="card-content">
+                        <div class="card-category">${raffle.category}</div>
+                        <h3 class="card-title">${raffle.title}</h3>
+                        <p class="card-description">${raffle.description}</p>
+                        <div class="card-date">
+                            📅 ${raffle.date}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Sorteios realizados
+            const grid = document.getElementById('rafflesGrid');
+            grid.innerHTML = raffles.map(raffle => `
+                <div class="raffle-card" onclick="openModal(${raffle.id})">
+                    <img src="${raffle.image}" alt="${raffle.title}" class="card-image">
+                    <div class="card-content">
+                        <div class="card-category">${raffle.category}</div>
+                        <h3 class="card-title">${raffle.title}</h3>
+                        <p class="card-description">${raffle.description}</p>
+                        <div class="card-date">
+                            📅 ${raffle.date}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openModal(id) {
+            const allRaffles = [...upcomingRaffles, ...raffles];
+            const raffle = allRaffles.find(r => r.id === id);
+            if (!raffle) return;
+
+            document.getElementById('modalImage').src = raffle.image;
+            document.getElementById('modalTitle').textContent = raffle.title;
+            document.getElementById('modalDate').textContent = raffle.date;
+            document.getElementById('modalPrize').textContent = raffle.prize;
+            document.getElementById('modalWinnerCount').textContent = raffle.winners.length;
+            document.getElementById('modalDescription').textContent = raffle.description;
+
+            const winnersList = document.getElementById('winnersList');
+            winnersList.innerHTML = raffle.winners.map(winner => `
+                <div class="winner-item">
+                    <span class="winner-position">${winner.position}</span>
+                    <div class="winner-info">
+                        <div class="winner-name" data-cpf="${winner.cpf}" data-phone="${winner.phone}" data-draw-id="${winner.drawId}" data-participation-date="${winner.participationDate}" data-phrase="${winner.phrase}">${winner.name}</div>
+                        <div class="winner-prize">${winner.prize}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        initRaffles();
+
+        // Modal for displaying winner data
+        const winnerModal = document.createElement('div');
+        winnerModal.classList.add('modal');
+        winnerModal.innerHTML = `
+            <div class='modal-content'>
+                <span class='modal-close'>&times;</span>
+                <div class='modal-body'>
+                    <h2 class='modal-title'>Detalhes do Sorteado</h2>
+                    <div id='winner-data'></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(winnerModal);
+
+        // Function to open modal with winner data
+        function openWinnerModal(winner) {
+            const winnerDataDiv = document.getElementById('winner-data');
+            winnerDataDiv.innerHTML = `<p>CPF: ${winner.cpf}</p><p>Phone: ${winner.phone}</p><p>N° Sorteio: ${winner.drawId}</p><p>Data da Participação: ${winner.participationDate}</p><p>Frase selecionada: ${winner.phrase}</p>`;
+            winnerModal.classList.add('active');
+        }
+
+        // Function to close winner modal
+        function closeWinnerModal() {
+            winnerModal.classList.remove('active');
+        }
+
+        // Close modal functionality
+        winnerModal.querySelector('.modal-close').onclick = closeWinnerModal;
+
+        // Close modal when clicking outside
+        winnerModal.addEventListener('click', (e) => {
+            if (e.target === winnerModal) {
+                closeWinnerModal();
+            }
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && winnerModal.classList.contains('active')) {
+                closeWinnerModal();
+            }
+        });
+
+        // Event listener for winner names
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('winner-name')) {
+                const winner = {
+                    cpf: e.target.dataset.cpf,
+                    phone: e.target.dataset.phone,
+                    drawId: e.target.dataset.drawId,
+                    participationDate: e.target.dataset.participationDate,
+                    phrase: e.target.dataset.phrase
+                };
+                openWinnerModal(winner);
+            }
+        });
+    </script>
+</body>
+</html>
+<footer style="background-color: var(--accent-dark); color: var(--accent-light); padding: 60px 50px; margin-top: 100px; text-align: center;">
+    <p style="margin-bottom: 10px;">© 2025 Omelete&CO - Todos os direitos reservados</p>
+    <p style="font-size: 14px; opacity: 0.8;">Acompanhe nossas promoções e sorteios nas redes sociais</p>
+</footer>
